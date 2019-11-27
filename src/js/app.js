@@ -18,11 +18,11 @@ let characters = {
     character_1 : './src/img/character_run.png'
 };
 
-let enemies= {
+let enemiesTypes= {
     enemie_1 : './src/img/enemie.png'
 };
 
-let enemie = [];
+let enemies = [];
 let frames = 0;
 let currentFrame=0;
 let enemyCurrentFrame=0;
@@ -45,8 +45,7 @@ canvas.height = canvasHeight;
      draw(){
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(this.image, this.xPos, this.yPos, this.width, this.height);
-        ctx.drawImage(this.image, this.xPos + this.width, this.yPos, this.width, this.height);
-        
+        ctx.drawImage(this.image, this.xPos + this.width, this.yPos, this.width, this.height); 
      }
  }
 
@@ -82,12 +81,10 @@ canvas.height = canvasHeight;
          this.xPos -=20;
      }
      checkIfTouch(enemie){
-        return (
-            this.xPos < enemie.xPos + enemie.width &&
-            this.xPos + this.width > enemie.x &&
-            this.yPos < enemie.y + enemie.height &&
-            this.yPos + this.height > enemie.y
-          );
+        if (this.xPos + this.width > enemie.xPos && enemie.xPos + enemie.width > this.xPos && this.yPos < enemie.yPos + enemie.height && this.yPos + this.height > enemie.yPos) {
+            return true;
+        }
+        return false;
      }
 
  }
@@ -104,7 +101,7 @@ canvas.height = canvasHeight;
          this.srch = srch;
 
          this.image = new Image();
-         this.image.src = enemies.enemie_1;
+         this.image.src = enemiesTypes.enemie_1;
          this.image.onload = this.draw();
 
      }
@@ -138,31 +135,41 @@ canvas.height = canvasHeight;
      character.draw();
      generateEnemies();
      drawEnemies();
-     checkColliton();
+     enemies.forEach(enemie =>{
+        if(character.checkIfTouch(enemie)){
+            gameOver();
+        }
+     });
+     
  }
 
  function generateEnemies (){
 
-    let times = [200];
-    let i = Math.floor(Math.random() * times.length);
-     if (frames % times[i] !== 0) return;
-
+     let randomNumber = Math.floor(Math.random() * 1) + 0;
+     let aleatoryNumber = 250;
     
-     let randomPosX= Math.floor(Math.random()*canvas.width);
-     if(frames % 50 == 0){
-        let newEnemie = new Enemie (randomPosX, 500, 160/6 ,200,0,0, 160/7 , 100);
-        enemie.push(newEnemie);
-     }
+        switch (randomNumber){
+        case 0:
+            aleatoryNumber = 150.50;
+            drawRandom(aleatoryNumber);
+            break;
+        case 1:
+            aleatoryNumber = 750;
+            drawRandom(aleatoryNumber);
+            break;
+        
+       
+        }
+ }
+ function drawRandom(aleatoryNumber){
+    if(frames % aleatoryNumber == 0){
+        let newEnemie = new Enemie (canvas.width, 500, 160/6 ,200,0,0, 160/7 , 100);
+        enemies.push(newEnemie);
     
-    //  if (this.frames % 50 == 0) {
-    //     this.enemies.push(new Unit(this.width, this.floorYPos - 20, 20, 20, koopa, 3))
-    // }
-
-
-     
+    }
  }
  function drawEnemies(){
-     enemie.forEach(enemie =>{
+     enemies.forEach(enemie =>{
          enemie.draw();
          enemie.move();
      });
@@ -170,11 +177,13 @@ canvas.height = canvasHeight;
 
  function gameOver(){
     Swal.fire('Game over');
+    clearInterval(interval);
+    
  }
 
  function checkColliton(){
      enemie.forEach(enemies =>{
-         console.log(enemies);
+        // console.log(enemies);
          if(character.checkIfTouch(enemies)){
              gameOver();
          }
