@@ -1,12 +1,14 @@
+
 //Global variables
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 let speed = 1; 
-let canvasWidth = 2000;
+let canvasWidth = 1200;
 let canvasHeight = 600;
 let floorYPos = canvas.height;
 //globals
 let interval;
+let gravity = 1;
 
 let images = {
     bg :  './src/img/background.png'
@@ -23,6 +25,7 @@ let enemies= {
 let enemie = [];
 let frames = 0;
 let currentFrame=0;
+let enemyCurrentFrame=0;
 canvas.width= canvasWidth;
 canvas.height = canvasHeight;
 
@@ -67,23 +70,24 @@ canvas.height = canvasHeight;
         this.image.onload = this.draw.bind(this);
      }
      draw(){
-        // if (this.yPos< canvas.height - this.height) {
-        //     this.yPos += gravity;
-        //   }
-        // if(this.yPos + this.height < floorYPos){
-        //     this.yPos+=gravity;
-        // }
-        // if(this.yPos + this.height > floorYPos){
-        //     this.yPos = floorYPos - this.height;
-        // }
+        if(this.yPos <= 480) {
+            this.yPos += gravity;
+        }
           ctx.drawImage(this.image, currentFrame * (217/6), this.srcy, this.srcw, this.srch, this.xPos, this.yPos, this.width, this.height);
      }
      runForward(){
          this.xPos +=20;
-        // ctx.drawImage(this.image, currentFrame * (217/6), this.srcy, this.srcw, this.srch, this.xPos, this.yPos, this.width, this.height);
      }
      runBack(){
          this.xPos -=20;
+     }
+     checkIfTouch(enemie){
+        return (
+            this.xPos < enemie.xPos + enemie.width &&
+            this.xPos + this.width > enemie.x &&
+            this.yPos < enemie.y + enemie.height &&
+            this.yPos + this.height > enemie.y
+          );
      }
 
  }
@@ -105,14 +109,17 @@ canvas.height = canvasHeight;
 
      }
      draw(){
-        ctx.drawImage(this.image, currentFrame * (160/6), this.srcy, this.srcw, this.srch, this.xPos, this.yPos, this.width, this.height);
+        ctx.drawImage(this.image, enemyCurrentFrame * (176/7), this.srcy, this.srcw, this.srch, this.xPos, this.yPos, this.width, this.height);
 
+     }
+     move(){
+         this.xPos -=.5;
      }
  }
  //Instances 
  let board = new Board();
  let character = new Character(250,450, 217/6 ,152,0,0, 217/6 , 100);
- let simpleEnemie = new Enemie (350,500, 160/6 ,152,0,0, 160/7 , 100);
+
  //Main functions
  function start(){
     interval = setInterval(update, 1000 / 60);
@@ -122,26 +129,55 @@ canvas.height = canvasHeight;
     ctx.clearRect(0,0, canvas.width, canvas.height);
     if(frames % 7 === 0) {
         currentFrame = ++currentFrame % 4;
-      }
+    }
+    if(frames % 17 === 0) {
+        enemyCurrentFrame = ++enemyCurrentFrame % 7;
+    }
       frames++;
      board.draw();
      character.draw();
      generateEnemies();
-     drawEnemies()
-     simpleEnemie.draw();
+     drawEnemies();
+     checkColliton();
  }
+
  function generateEnemies (){
-     let times = [200];
-     let i = Math.floor(Math.random() * times.length);
-     let randomPosX= Math.floor(Math.random()*canvas.width+250);
+
+    let times = [200];
+    let i = Math.floor(Math.random() * times.length);
      if (frames % times[i] !== 0) return;
-     let newEnemie = new Enemie (randomPosX, 500, 160/6 ,152,0,0, 160/7 , 100);
-     enemie.push(newEnemie);
+
+    
+     let randomPosX= Math.floor(Math.random()*canvas.width);
+     if(frames % 50 == 0){
+        let newEnemie = new Enemie (randomPosX, 500, 160/6 ,200,0,0, 160/7 , 100);
+        enemie.push(newEnemie);
+     }
+    
+    //  if (this.frames % 50 == 0) {
+    //     this.enemies.push(new Unit(this.width, this.floorYPos - 20, 20, 20, koopa, 3))
+    // }
+
+
      
  }
  function drawEnemies(){
      enemie.forEach(enemie =>{
          enemie.draw();
+         enemie.move();
+     });
+ }
+
+ function gameOver(){
+    Swal.fire('Game over');
+ }
+
+ function checkColliton(){
+     enemie.forEach(enemies =>{
+         console.log(enemies);
+         if(character.checkIfTouch(enemies)){
+             gameOver();
+         }
      });
  }
  addEventListener("keydown" , e =>{
