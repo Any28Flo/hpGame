@@ -22,10 +22,15 @@ let enemiesTypes= {
     enemie_1 : './src/img/enemie.png'
 };
 
+let coins ={
+    coin_1 : './src/img/coin.png'
+};
+
 let enemies = [];
 let frames = 0;
 let currentFrame=0;
 let enemyCurrentFrame=0;
+let coinCurrentFrame = 0;
 canvas.width= canvasWidth;
 canvas.height = canvasHeight;
 
@@ -82,9 +87,13 @@ canvas.height = canvasHeight;
      }
      checkIfTouch(enemie){
         if (this.xPos + this.width > enemie.xPos && enemie.xPos + enemie.width > this.xPos && this.yPos < enemie.yPos + enemie.height && this.yPos + this.height > enemie.yPos) {
+            
             return true;
         }
+       
         return false;
+
+
      }
 
  }
@@ -107,16 +116,41 @@ canvas.height = canvasHeight;
      }
      draw(){
         ctx.drawImage(this.image, enemyCurrentFrame * (176/7), this.srcy, this.srcw, this.srch, this.xPos, this.yPos, this.width, this.height);
-
      }
      move(){
          this.xPos -=.5;
      }
  }
- //Instances 
- let board = new Board();
- let character = new Character(250,450, 217/6 ,152,0,0, 217/6 , 100);
+ class Coin {
+    constructor(xPos,yPos,width,height){
+    //constructor(xPos,yPos,width,height, srcx, srcy, srcw, srch){
+        this.xPos = xPos;
+        this.yPos = yPos;
+        this.width = width;
+        this.height = height;
 
+        // this.srcx = srcx;
+        // this.srcy = srcy;
+        // this.srcw = srcw;
+        // this.srch = srch;
+
+        this.image = new Image();
+        this.image.src = coins.coin_1;
+        this.image.onload = this.draw();
+
+    }
+    draw(){
+        ctx.drawImage(this.image, this.xPos, this.yPos , this.width, this.height)
+       //ctx.drawImage(this.image, coinCurrentFrame * (613/10), this.srcy, this.srcw, this.srch, this.xPos, this.yPos, this.width, this.height);
+
+    }
+ 
+}
+ //Instances 
+ let board = new Board();   
+ let character = new Character(250,450, 217/6*1.5 ,69,0,0, 217/6 , 46);
+ //let coin = new Coin          (100, 200, 613/10 , 70,0, 0 ,613/10 ,65);
+ let coin = new Coin(200,350,109/3,114/3);
  //Main functions
  function start(){
     interval = setInterval(update, 1000 / 60);
@@ -127,25 +161,26 @@ canvas.height = canvasHeight;
     if(frames % 7 === 0) {
         currentFrame = ++currentFrame % 4;
     }
-    if(frames % 17 === 0) {
+    if(frames % 7 === 0) {
         enemyCurrentFrame = ++enemyCurrentFrame % 7;
+        generateEnemies();
     }
-      frames++;
+    
+    frames++;
      board.draw();
      character.draw();
-     generateEnemies();
      drawEnemies();
-     enemies.forEach(enemie =>{
-        if(character.checkIfTouch(enemie)){
-            gameOver();
-        }
-     });
-     
+     checkColliton();
+         
+    //if(frames % 5 === 0) {
+      //  coinCurrentFrame = ++coinCurrentFrame % 5;
+        coin.draw();
+
+    //}  
  }
 
  function generateEnemies (){
-
-     let randomNumber = Math.floor(Math.random() * 1) + 0;
+     let randomNumber = Math.floor(Math.random() * 5) + 0;
      let aleatoryNumber = 250;
     
         switch (randomNumber){
@@ -158,12 +193,19 @@ canvas.height = canvasHeight;
             drawRandom(aleatoryNumber);
             break;
         
-       
+        case 2:
+            aleatoryNumber = 50;
+            drawRandom(aleatoryNumber);
+            break;
+        case 3:
+            aleatoryNumber = 50;
+            drawRandom(aleatoryNumber);
+            break;    
         }
  }
  function drawRandom(aleatoryNumber){
     if(frames % aleatoryNumber == 0){
-        let newEnemie = new Enemie (canvas.width, 500, 160/6 ,200,0,0, 160/7 , 100);
+        let newEnemie = new Enemie (canvas.width, 500, 176/7*2 ,52,0,0, 160/7, 26);
         enemies.push(newEnemie);
     
     }
@@ -182,13 +224,15 @@ canvas.height = canvasHeight;
  }
 
  function checkColliton(){
-     enemie.forEach(enemies =>{
-        // console.log(enemies);
-         if(character.checkIfTouch(enemies)){
+     enemies.forEach(enemie =>{
+         if(character.checkIfTouch(enemie)){
              gameOver();
          }
      });
  }
+
+ 
+
  addEventListener("keydown" , e =>{
      switch(e.which){
          case  39:
