@@ -15,7 +15,8 @@ let images = {
 };
 
 let characters = {
-    character_1 : './src/img/character_run.png'
+    character_1 : './src/img/character_run.png',
+    character_2 : './src/img/linkAttack.png'
 };
 
 let enemiesTypes= {
@@ -25,7 +26,9 @@ let enemiesTypes= {
 let coins ={
     coin_1 : './src/img/coin.png'
 };
-
+let weapons = {
+    'arrow' : './src/img/bullet.png'
+}
 let enemies = [];
 let coinsArray = [];
 let frames = 0;
@@ -43,16 +46,33 @@ canvas.height = canvasHeight;
          this.yPos = 0;
          this.width =canvas.width ;
          this.height = canvas.height;
-         
+         this.xPosBg2 = canvas.width;
+
          this.gravity = 5;
          this.image = new Image();
          this.image.src = images.bg;
          this.image.onload = this.draw();
         }  
      draw(){
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // ctx.drawImage(this.image, this.xPos, this.yPos, this.width, this.height);
+        //ctx.drawImage(this.image, this.xPos + this.width, this.yPos, this.width, this.height); 
+        if (this.xPos < 0) {
+            this.xPosBg2 = this.xPos + this.width
+        }
+        if (this.xPos > 0) {
+            this.xPosBg2 = this.xPos - this.width
+        }
+        if (this.xPosBg2 < 0) {
+            this.xPos = this.xPosBg2 + this.width
+        }
+        if (this.xPosBg2 > 0) {
+            this.xPos = this.xPosBg2 - this.width
+        }
         ctx.drawImage(this.image, this.xPos, this.yPos, this.width, this.height);
-        ctx.drawImage(this.image, this.xPos + this.width, this.yPos, this.width, this.height); 
+        ctx.drawImage(this.image, this.xPosBg2, this.yPos, this.width, this.height);
+        //this.ctx.drawImage(this.image, this.xPos, 0, this.width, this.height);
+        //this.ctx.drawImage(this.image, this.xPosBg2, 0, this.width, this.height);
      }
  }
 
@@ -77,6 +97,7 @@ canvas.height = canvasHeight;
         this.image.onload = this.draw.bind(this);
      }
      draw(){
+        this.image.src = characters.character_1;
         if(this.yPos <= 480) {
             this.yPos += gravity;
         }
@@ -98,6 +119,12 @@ canvas.height = canvasHeight;
 
 
      }
+     attack(){
+        this.image.src = characters.character_2;
+       // ctx.drawImage(this.image, currentFrame * (37/1), this.srcy, this.srcw, this.srch*1.5, this.xPos, this.yPos, this.width, this.height);
+       ctx.clearRect(this.image, this.xPos,this.yPos, this.width , this.height);
+        //ctx.drawImage(this.image, this.xPos, this.yPos , this.width*2, this.height*2);
+     }
 
  }
  class Enemie {
@@ -106,6 +133,7 @@ canvas.height = canvasHeight;
          this.yPos = yPos;
          this.width = width;
          this.height = height;
+         this.markedForDeletion = false;
 
          this.srcx = srcx;
          this.srcy = srcy;
@@ -143,7 +171,7 @@ canvas.height = canvasHeight;
 
     }
     draw(){
-        ctx.drawImage(this.image, this.xPos, this.yPos , this.width, this.height)
+        ctx.drawImage(this.image, this.xPos, this.yPos , this.width, this.height);
        //ctx.drawImage(this.image, coinCurrentFrame * (613/10), this.srcy, this.srcw, this.srch, this.xPos, this.yPos, this.width, this.height);
 
     }
@@ -155,9 +183,33 @@ canvas.height = canvasHeight;
     }
  
 }
+ class Bullet{
+     constructor (character){
+         this.width = 20;
+         this.height = 20;
+         this.xPos = character.width/2 + character.xPos + this.width/2;
+         this.yPos = character.yPos + this.height +5;
+         this.image = new Image();
+         this.image.src = weapons.arrow;
+         this.image.onload = this.draw();
+
+     }
+     draw(){
+        ctx.drawImage(this.image, this.xPos, this.yPos , this.width, this.height);
+       //ctx.drawImage(this.image, coinCurrentFrame * (613/10), this.srcy, this.srcw, this.srch, this.xPos, this.yPos, this.width, this.height);
+
+    }
+    move(){
+        for(let i = this.xPos ; i <= canvas.width ; i++){
+            this.xPos +=.1;
+        }
+        
+    }
+ }
  //Instances 
  let board = new Board();   
  let character = new Character(250,450, 217/6*1.5 ,69,0,0, 217/6 , 46);
+ let newBullet = new Bullet( character);
  //let coin = new Coin          (100, 200, 613/10 , 70,0, 0 ,613/10 ,65);
  
  //Main functions
@@ -180,18 +232,27 @@ canvas.height = canvasHeight;
      character.draw();
      drawEnemies();
      checkColliton();
-         
-    //if(frames % 5 === 0) {
-      //  coinCurrentFrame = ++coinCurrentFrame % 5;
-      //  coin.draw();
-      generateCoins();
-      drawCoins();
-      sumCoins();
-
+     generateCoins();
+     drawCoins();
+     sumCoins();
+     newBullet.draw();
+     
     //}  
  }
-
+ function attack(){
+    enemies.forEach(enemie =>{
+        if(newBullet.xPos < enemie.xPos){
+            newBullet.xPos+=10;
+        }
+    })
+ }
  function generateEnemies (){
+    let times = [200];
+  let i = Math.floor(Math.random() * times.length);
+  if (frames % times[i] !== 0){
+    return;
+  }else{
+
      let randomNumber = Math.floor(Math.random() * 5) + 0;
      let aleatoryNumber = 250;
     
@@ -214,6 +275,7 @@ canvas.height = canvasHeight;
             drawRandom(aleatoryNumber);
             break;    
         }
+    }
  }
  function drawRandom(aleatoryNumber){
     if(frames % aleatoryNumber == 0){
@@ -224,8 +286,10 @@ canvas.height = canvasHeight;
  }
  function drawEnemies(){
      enemies.forEach(enemie =>{
+        if(!enemie.markedForDeletion){
          enemie.draw();
          enemie.move();
+        }
      });
  }
 
@@ -244,8 +308,7 @@ canvas.height = canvasHeight;
  }
 
  function generateCoins(){
-    var myNumber = Math.floor(Math.random()*canvas.width);
-    myNumber = myNumber *30 + 15;
+   
     
  let posX = Math.floor(Math.random() * canvas.width)+ character.xPos;
  let times = [200];
@@ -301,10 +364,39 @@ canvas.height = canvasHeight;
         case 40:
                 character.yPos +=20;   
                 break; 
+        case 32:
+                 
+                character.attack();
+                attack();
+                newBullet.move();
+               // newBullet.xPos +=20;  
+              
+                // enemies.forEach(enemie =>{
+                //     for(let i = newBullet.xPos ; i < enemie.xPos ; i++){
+                //         newBullet.xPos += 1;
+                //         newBullet.draw();
+                //     }
+                //     if(character.checkIfTouch(enemie)){
+                        
+                //         enemie.markedForDeletion = true;
+                //     }
+               // });
+                break; 
         default:
             break;
 
      }
  });
+ //addEventListener('keydown', keyDownHandler);
+// addEventListener("keyup", e=>{
+//     switch(e.which){
+//         case 32:
+//                  character.draw();
+//                  break;
+//         default:
+//             break;
+    
+//     }
+// });
 
  start();
