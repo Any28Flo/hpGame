@@ -27,10 +27,12 @@ let coins ={
 };
 
 let enemies = [];
+let coinsArray = [];
 let frames = 0;
 let currentFrame=0;
 let enemyCurrentFrame=0;
 let coinCurrentFrame = 0;
+let totalCoins = 0 ;
 canvas.width= canvasWidth;
 canvas.height = canvasHeight;
 
@@ -68,6 +70,7 @@ canvas.height = canvasHeight;
 
         this.life = 3;
         this.speed = 5;
+        this.score = 0;
 
         this.image = new Image();
         this.image.src = characters.character_1;
@@ -128,7 +131,7 @@ canvas.height = canvasHeight;
         this.yPos = yPos;
         this.width = width;
         this.height = height;
-
+        this.markedForDeletion = false;
         // this.srcx = srcx;
         // this.srcy = srcy;
         // this.srcw = srcw;
@@ -144,13 +147,19 @@ canvas.height = canvasHeight;
        //ctx.drawImage(this.image, coinCurrentFrame * (613/10), this.srcy, this.srcw, this.srch, this.xPos, this.yPos, this.width, this.height);
 
     }
+    delete(){
+        this.image.enabled=false;
+        //console.log("Inside delete"+ this)
+        ctx.clearRect(this.image, this.xPos,this.yPos, this.width , this.height);
+
+    }
  
 }
  //Instances 
  let board = new Board();   
  let character = new Character(250,450, 217/6*1.5 ,69,0,0, 217/6 , 46);
  //let coin = new Coin          (100, 200, 613/10 , 70,0, 0 ,613/10 ,65);
- let coin = new Coin(200,350,109/3,114/3);
+ 
  //Main functions
  function start(){
     interval = setInterval(update, 1000 / 60);
@@ -174,7 +183,10 @@ canvas.height = canvasHeight;
          
     //if(frames % 5 === 0) {
       //  coinCurrentFrame = ++coinCurrentFrame % 5;
-        coin.draw();
+      //  coin.draw();
+      generateCoins();
+      drawCoins();
+      sumCoins();
 
     //}  
  }
@@ -231,6 +243,44 @@ canvas.height = canvasHeight;
      });
  }
 
+ function generateCoins(){
+    var myNumber = Math.floor(Math.random()*canvas.width);
+    myNumber = myNumber *30 + 15;
+    
+ let posX = Math.floor(Math.random() * canvas.width)+ character.xPos;
+ let times = [200];
+  let i = Math.floor(Math.random() * times.length);
+  if (frames % times[i] !== 0){
+    return;
+  }else{
+    for(let m= 0 ; m <= 5 ; m++){
+       //coinsArray.push(new Coin(posX+109,350,109/3,114/3));
+    }
+    coinsArray.push(new Coin( posX,350,109/3,114/3));
+
+  } 
+  
+ }
+
+ function drawCoins(){
+    coinsArray.forEach(coin =>{
+        if(!coin.markedForDeletion){
+            coin.draw();
+           
+        }
+        
+     });
+ }
+ function sumCoins(){
+   
+    coinsArray.forEach(coin =>{
+        if(character.checkIfTouch(coin)){
+            coin.markedForDeletion = true;
+            character.score += .1;
+        }
+        
+    });
+}
  
 
  addEventListener("keydown" , e =>{
