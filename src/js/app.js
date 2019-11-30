@@ -55,9 +55,7 @@ canvas.height = canvasHeight;
          this.image.onload = this.draw();
         }  
      draw(){
-        // ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // ctx.drawImage(this.image, this.xPos, this.yPos, this.width, this.height);
-        //ctx.drawImage(this.image, this.xPos + this.width, this.yPos, this.width, this.height); 
+ 
         if (this.xPos < 0) {
             this.xPosBg2 = this.xPos + this.width
         }
@@ -99,7 +97,6 @@ canvas.height = canvasHeight;
 
         this.image = new Image();
         this.image.src = characters.character_1;
-        this.image.onload = this.draw.bind(this);
      }
      draw(){
         this.image.src = characters.character_1;
@@ -109,16 +106,16 @@ canvas.height = canvasHeight;
           ctx.drawImage(this.image, currentFrame * (217/6), this.srcy, this.srcw, this.srch, this.xPos, this.yPos, this.width, this.height);
      }
      runForward(){
-         if(this.xPos < canvas.width){
+        // if(this.xPos < canvas.width){
             this.xPos +=20;
 
-         }
+         //}
          
      }
      runBack(){
-         if(this.xPos > 0){
+        // if(this.xPos > 0){
             this.xPos -=20;
-         }
+        // }
          
      }
      checkIfTouch(enemie){
@@ -133,9 +130,7 @@ canvas.height = canvasHeight;
      }
      attack(){
         this.image.src = characters.character_2;
-       // ctx.drawImage(this.image, currentFrame * (37/1), this.srcy, this.srcw, this.srch*1.5, this.xPos, this.yPos, this.width, this.height);
        ctx.clearRect(this.image, this.xPos,this.yPos, this.width , this.height);
-        //ctx.drawImage(this.image, this.xPos, this.yPos , this.width*2, this.height*2);
      }
 
  }
@@ -215,7 +210,7 @@ canvas.height = canvasHeight;
  
  //Main functions
  function start(){
-    interval = setInterval(update, 100 / 60);
+    interval = setInterval(update, 1000/60);
     
  }
  function update(){
@@ -229,6 +224,7 @@ canvas.height = canvasHeight;
     }
     
     frames++;
+    console.log(frames);
      board.draw();
      character.draw();
      drawEnemies();
@@ -236,7 +232,7 @@ canvas.height = canvasHeight;
      generateCoins();
      drawCoins();
      sumCoins();
-     //score(character);
+     score(character);
  }
  function attack(){
     enemies.forEach(enemie =>{
@@ -360,16 +356,16 @@ function score(character){
              board.xPos -=20;
              break;
         case 37:
-            character.runBack();
-           // character.xPos  -=20;
+           character.runBack();
+            character.xPos  -=20;
             board.xPos +=20;
             break;
         case 38:
 
-            character.yPos -=20;
+            character.yPos -=40;
             break;
         case 40:
-                character.yPos +=20;   
+            character.yPos +=20; 
                 break; 
        
         default:
