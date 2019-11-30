@@ -71,9 +71,13 @@ canvas.height = canvasHeight;
         }
         ctx.drawImage(this.image, this.xPos, this.yPos, this.width, this.height);
         ctx.drawImage(this.image, this.xPosBg2, this.yPos, this.width, this.height);
-        //this.ctx.drawImage(this.image, this.xPos, 0, this.width, this.height);
-        //this.ctx.drawImage(this.image, this.xPosBg2, 0, this.width, this.height);
+      
      }
+        move(value){
+        this.xPosBg+=value;
+        this.xPosBg2+=value;
+        
+    }
  }
 
 
@@ -89,7 +93,7 @@ canvas.height = canvasHeight;
         this.srch = srch;
 
         this.life = 3;
-        this.speed = 5;
+        this.speed = 2;
         this.score = 0;
 
         this.image = new Image();
@@ -98,16 +102,24 @@ canvas.height = canvasHeight;
      }
      draw(){
         this.image.src = characters.character_1;
-        if(this.yPos <= 480) {
+        if(this.yPos <= 480 || this.yPos < 0) {
             this.yPos += gravity;
         }
           ctx.drawImage(this.image, currentFrame * (217/6), this.srcy, this.srcw, this.srch, this.xPos, this.yPos, this.width, this.height);
      }
      runForward(){
-         this.xPos +=20;
+         if(this.xPos < canvas.width){
+            this.xPos +=20;
+
+         }else if(this.xPos < canvas.width+ this.width){
+
+         }
      }
      runBack(){
-         this.xPos -=20;
+         if(this.xPos > 0){
+            this.xPos -=20;
+         }
+         
      }
      checkIfTouch(enemie){
         if (this.xPos + this.width > enemie.xPos && enemie.xPos + enemie.width > this.xPos && this.yPos < enemie.yPos + enemie.height && this.yPos + this.height > enemie.yPos) {
@@ -160,10 +172,6 @@ canvas.height = canvasHeight;
         this.width = width;
         this.height = height;
         this.markedForDeletion = false;
-        // this.srcx = srcx;
-        // this.srcy = srcy;
-        // this.srcw = srcw;
-        // this.srch = srch;
 
         this.image = new Image();
         this.image.src = coins.coin_1;
@@ -172,12 +180,9 @@ canvas.height = canvasHeight;
     }
     draw(){
         ctx.drawImage(this.image, this.xPos, this.yPos , this.width, this.height);
-       //ctx.drawImage(this.image, coinCurrentFrame * (613/10), this.srcy, this.srcw, this.srch, this.xPos, this.yPos, this.width, this.height);
-
     }
     delete(){
         this.image.enabled=false;
-        //console.log("Inside delete"+ this)
         ctx.clearRect(this.image, this.xPos,this.yPos, this.width , this.height);
 
     }
@@ -188,7 +193,7 @@ canvas.height = canvasHeight;
          this.width = 20;
          this.height = 20;
          this.xPos = character.width/2 + character.xPos + this.width/2;
-         this.yPos = character.yPos + this.height +5;
+         this.yPos = character.yPos + this.height + 2;
          this.image = new Image();
          this.image.src = weapons.arrow;
          this.image.onload = this.draw();
@@ -196,7 +201,6 @@ canvas.height = canvasHeight;
      }
      draw(){
         ctx.drawImage(this.image, this.xPos, this.yPos , this.width, this.height);
-       //ctx.drawImage(this.image, coinCurrentFrame * (613/10), this.srcy, this.srcw, this.srch, this.xPos, this.yPos, this.width, this.height);
 
     }
     move(){
@@ -214,7 +218,7 @@ canvas.height = canvasHeight;
  
  //Main functions
  function start(){
-    interval = setInterval(update, 1000 / 60);
+    interval = setInterval(update, 1500 / 60);
     
  }
  function update(){
@@ -339,7 +343,8 @@ canvas.height = canvasHeight;
     coinsArray.forEach(coin =>{
         if(character.checkIfTouch(coin)){
             coin.markedForDeletion = true;
-            character.score += .1;
+            var points = Math.floor(frames / 100);
+            character.score += points;
         }
         
     });
@@ -369,34 +374,12 @@ canvas.height = canvasHeight;
                 character.attack();
                 attack();
                 newBullet.move();
-               // newBullet.xPos +=20;  
-              
-                // enemies.forEach(enemie =>{
-                //     for(let i = newBullet.xPos ; i < enemie.xPos ; i++){
-                //         newBullet.xPos += 1;
-                //         newBullet.draw();
-                //     }
-                //     if(character.checkIfTouch(enemie)){
-                        
-                //         enemie.markedForDeletion = true;
-                //     }
-               // });
+
                 break; 
         default:
             break;
 
      }
  });
- //addEventListener('keydown', keyDownHandler);
-// addEventListener("keyup", e=>{
-//     switch(e.which){
-//         case 32:
-//                  character.draw();
-//                  break;
-//         default:
-//             break;
-    
-//     }
-// });
 
  start();

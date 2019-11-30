@@ -1,7 +1,14 @@
+@font-face {
+    font-family: Hylia;
+    font-weight: bold;
+    src: url("./../../src/fonts/HyliaSerifBeta-Regular.otf") format("opentype");
+}
 body {
     padding: 0;
     margin: 0;
+    font-family: Hylia;
 }
+
 #canvas {
     display: block;
     margin: 0;
@@ -10,4 +17,15 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     border: 1px solid black;
+}
+.intro{
+    font: 1em Hylia;
+    background-image: url("./../img/wallpaper.jpg");
+    height: 100vh;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color:goldenrod;
+    text-align: right;
+
 }
