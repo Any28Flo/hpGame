@@ -111,7 +111,8 @@ canvas.height = canvasHeight;
          if(this.xPos < canvas.width){
             this.xPos +=20;
 
-         }else if(this.xPos < canvas.width+ this.width){
+         }else if(this.xPos+this.width >= canvas.width){
+            this.xPos -=20;
 
          }
      }
