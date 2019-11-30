@@ -31,6 +31,7 @@ let weapons = {
 }
 let enemies = [];
 let coinsArray = [];
+let trueCoin =[];
 let frames = 0;
 let currentFrame=0;
 let enemyCurrentFrame=0;
@@ -111,10 +112,8 @@ canvas.height = canvasHeight;
          if(this.xPos < canvas.width){
             this.xPos +=20;
 
-         }else if(this.xPos+this.width >= canvas.width){
-            this.xPos -=20;
-
          }
+         
      }
      runBack(){
          if(this.xPos > 0){
@@ -167,13 +166,12 @@ canvas.height = canvasHeight;
  }
  class Coin {
     constructor(xPos,yPos,width,height){
-    //constructor(xPos,yPos,width,height, srcx, srcy, srcw, srch){
         this.xPos = xPos;
         this.yPos = yPos;
         this.width = width;
         this.height = height;
         this.markedForDeletion = false;
-
+        this.score = false;
         this.image = new Image();
         this.image.src = coins.coin_1;
         this.image.onload = this.draw();
@@ -214,12 +212,10 @@ canvas.height = canvasHeight;
  //Instances 
  let board = new Board();   
  let character = new Character(250,450, 217/6*1.5 ,69,0,0, 217/6 , 46);
- let newBullet = new Bullet( character);
- //let coin = new Coin          (100, 200, 613/10 , 70,0, 0 ,613/10 ,65);
  
  //Main functions
  function start(){
-    interval = setInterval(update, 1500 / 60);
+    interval = setInterval(update, 100 / 60);
     
  }
  function update(){
@@ -240,23 +236,17 @@ canvas.height = canvasHeight;
      generateCoins();
      drawCoins();
      sumCoins();
-     newBullet.draw();
-     
-    //}  
+     //score(character);
  }
  function attack(){
     enemies.forEach(enemie =>{
         if(newBullet.xPos < enemie.xPos){
             newBullet.xPos+=10;
         }
-    })
+    });
  }
  function generateEnemies (){
-    let times = [200];
-  let i = Math.floor(Math.random() * times.length);
-  if (frames % times[i] !== 0){
-    return;
-  }else{
+
 
      let randomNumber = Math.floor(Math.random() * 5) + 0;
      let aleatoryNumber = 250;
@@ -280,7 +270,7 @@ canvas.height = canvasHeight;
             drawRandom(aleatoryNumber);
             break;    
         }
-    }
+    
  }
  function drawRandom(aleatoryNumber){
     if(frames % aleatoryNumber == 0){
@@ -321,9 +311,7 @@ canvas.height = canvasHeight;
   if (frames % times[i] !== 0){
     return;
   }else{
-    for(let m= 0 ; m <= 5 ; m++){
-       //coinsArray.push(new Coin(posX+109,350,109/3,114/3));
-    }
+
     coinsArray.push(new Coin( posX,350,109/3,114/3));
 
   } 
@@ -344,13 +332,26 @@ canvas.height = canvasHeight;
     coinsArray.forEach(coin =>{
         if(character.checkIfTouch(coin)){
             coin.markedForDeletion = true;
-            var points = Math.floor(frames / 100);
-            character.score += points;
+            coin.score= true;
+
+          
         }
         
     });
+   trueCoin= coinsArray.filter(coin=>{
+        
+        return coin.score === true;
+    });
+    
+     
 }
- 
+
+
+function score(character){
+  
+    let scoreCharacter= character.score;
+    document.getElementById('score').innerHTML=scoreCharacter;
+}
 
  addEventListener("keydown" , e =>{
      switch(e.which){
@@ -370,13 +371,7 @@ canvas.height = canvasHeight;
         case 40:
                 character.yPos +=20;   
                 break; 
-        case 32:
-                 
-                character.attack();
-                attack();
-                newBullet.move();
-
-                break; 
+       
         default:
             break;
 
